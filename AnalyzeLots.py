@@ -44,10 +44,10 @@ def main() -> None:
                 symbols_gain.append(round(data.loc[data['symbol'] == iter_symbol, 'gain'].sum(), 2))
                 symbols_gain_long.append(
                     round(
-                        data.loc[(data['symbol'] == iter_symbol) & (data['date'] > one_year_prior), 'gain'].sum(0), 2))
+                        data.loc[(data['symbol'] == iter_symbol) & (data['date'] < one_year_prior), 'gain'].sum(0), 2))
                 symbols_gain_short.append(
                     round(
-                        data.loc[(data['symbol'] == iter_symbol) & (data['date'] <= one_year_prior), 'gain'].sum(0), 2))
+                        data.loc[(data['symbol'] == iter_symbol) & (data['date'] >= one_year_prior), 'gain'].sum(0), 2))
             print('Gain/Loss per symbol')
             symbols_dict: dict = {symbols[i]: symbols_gain[i] for i in range(len(symbols))}
             print("\n".join(f"{k}\t${v}" for k, v in symbols_dict.items()))
