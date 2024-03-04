@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 
 def parse_args() -> argparse.Namespace:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="Analyze Wealthfront cost-basis",
+        description="Analyze Wealthfront cost-basis data. Displays total short/long-term gains/losses by default.",
         epilog="File required")
-    parser.add_argument('-s', '--symbol', help='Display long-term basis by symbol', action='store_true')
+    parser.add_argument('-s', '--symbol', help='Display gain/loss by symbol and short/long-term gain/loss per symbol ', action='store_true')
     parser.add_argument('-n', '--no-summary', help='No summary', action='store_true')
     parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
     return parser.parse_args()
