@@ -27,7 +27,7 @@ def main() -> None:
             args.file, header=1, names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
         data['date'] = pandas.to_datetime(data['date'])
         gain: float = data['gain'].sum()
-        print(f'Total gain {gain}')
+        print(f'Total gain/loss {gain}')
         for gain, date in zip(data['gain'], data['date']):
             if date > one_year_prior:
                 short_term += gain
@@ -48,7 +48,7 @@ def main() -> None:
                 symbols_gain_short.append(
                     round(
                         data.loc[(data['symbol'] == iter_symbol) & (data['date'] >= one_year_prior), 'gain'].sum(0), 2))
-            print('Gain/Loss per symbol')
+            print('Total Gain/Loss per symbol')
             symbols_dict: dict = {symbols[i]: symbols_gain[i] for i in range(len(symbols))}
             print("\n".join(f"{k}\t${v}" for k, v in symbols_dict.items()))
             symbols_short_dict: dict = {symbols[i]: symbols_gain_short[i] for i in range(len(symbols))}
