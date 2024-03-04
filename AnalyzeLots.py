@@ -11,7 +11,7 @@ def parse_args() -> argparse.Namespace:
         epilog="File required")
     parser.add_argument('-s', '--symbol', help='Display long-term basis by symbol', action='store_true')
     parser.add_argument('-n', '--no-summary', help='No summary', action='store_true')
-    parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute())
+    parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
     return parser.parse_args()
 
 
