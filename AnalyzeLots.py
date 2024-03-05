@@ -27,7 +27,7 @@ def main() -> None:
                 args.file, header=1, names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
         data['date'] = pandas.to_datetime(data['date'])
         if not args.nosummary:
-            print(f"Total gain/loss ${data['gain'].sum()}")
+            print(f"Total gain/loss ${round(data['gain'].sum(), 2)}")
             for gain, date in zip(data['gain'], data['date']):
                 if date > one_year_prior:
                     short_term += gain
