@@ -29,18 +29,16 @@ def main() -> None:
             print(f"Short term gain/loss ${round(data.loc[data['date'] >= one_year_prior, 'gain'].sum(), 2):,.2f}")
             print(f"Long term gain/loss ${round(data.loc[data['date'] < one_year_prior, 'gain'].sum(), 2):,.2f}")
         if args.symbol | args.nosummary:
-            symbols: list[str] = data['symbol'].str.split(',\s*').explode().unique().tolist()
+            symbols: list[str] = data['symbol'].explode().unique().tolist()
             symbols_gain: list[float] = []
             symbols_gain_short: list[float] = []
             symbols_gain_long: list[float] = []
             for iter_symbol in symbols:
-                symbols_gain.append(round(data.loc[data['symbol'] == iter_symbol, 'gain'].sum(), 2))
+                symbols_gain.append(data.loc[data['symbol'] == iter_symbol, 'gain'].sum())
                 symbols_gain_long.append(
-                    round(
-                        data.loc[(data['symbol'] == iter_symbol) & (data['date'] < one_year_prior), 'gain'].sum(0), 2))
+                    data.loc[(data['symbol'] == iter_symbol) & (data['date'] < one_year_prior), 'gain'].sum(0))
                 symbols_gain_short.append(
-                    round(
-                        data.loc[(data['symbol'] == iter_symbol) & (data['date'] >= one_year_prior), 'gain'].sum(0), 2))
+                    data.loc[(data['symbol'] == iter_symbol) & (data['date'] >= one_year_prior), 'gain'].sum(0))
             symbols_dict: dict = {symbols[i]: symbols_gain[i] for i in range(len(symbols))}
             print('Total gain/loss per symbol')
             print("\n".join(f"{k}\t${v:,.2f}" for k, v in symbols_dict.items()))
