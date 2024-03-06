@@ -12,7 +12,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         '-s', '--symbol', help='Display gain/loss by symbol and short/long-term gain/loss per symbol',
         action='store_true')
-    parser.add_argument('-n', '--nosummary', help='No summary', action='store_true')
+    parser.add_argument('-n', '--no-summary', help='No summary', action='store_true')
     parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
     return parser.parse_args()
 
@@ -24,11 +24,11 @@ def main() -> None:
         data: pandas.DataFrame = pandas.read_csv(
                 args.file, header=1, names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
         data['date'] = pandas.to_datetime(data['date'])
-        if not args.nosummary:
+        if not args.no_summary:
             print(f"Total gain/loss ${round(data['gain'].sum(), 2):,.2f}")
             print(f"Short term gain/loss ${round(data.loc[data['date'] >= one_year_prior, 'gain'].sum(), 2):,.2f}")
             print(f"Long term gain/loss ${round(data.loc[data['date'] < one_year_prior, 'gain'].sum(), 2):,.2f}")
-        if args.symbol | args.nosummary:
+        if args.symbol | args.no_summary:
             symbols: list[str] = data['symbol'].explode().unique().tolist()
             symbols_gain: list[float] = []
             symbols_gain_short: list[float] = []
