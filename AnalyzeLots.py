@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-import pandas
 import argparse
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
+
+import pandas
 
 
 def parse_args() -> argparse.Namespace:
@@ -22,7 +23,7 @@ def main() -> None:
     one_year_prior: datetime = datetime.now() - timedelta(days=365)
     if args.file.is_file():
         data: pandas.DataFrame = pandas.read_csv(
-                args.file, header=1, names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
+            args.file, header=1, names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
         data['date'] = pandas.to_datetime(data['date'])
         if not args.no_summary:
             print(f"Total gain/loss ${round(data['gain'].sum(), 2):,.2f}")
