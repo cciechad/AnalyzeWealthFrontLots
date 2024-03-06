@@ -20,21 +20,14 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args: argparse.Namespace = parse_args()
     one_year_prior: datetime = datetime.now() - timedelta(days=365)
-    short_term: float = 0
-    long_term: float = 0
     if args.file.is_file():
         data: pandas.DataFrame = pandas.read_csv(
                 args.file, header=1, names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
         data['date'] = pandas.to_datetime(data['date'])
         if not args.nosummary:
             print(f"Total gain/loss ${round(data['gain'].sum(), 2)}")
-            for gain, date in zip(data['gain'], data['date']):
-                if date > one_year_prior:
-                    short_term += gain
-                else:
-                    long_term += gain
-            print(f'Short term gain/loss ${round(short_term, 2)}')
-            print(f'Long term gain/loss ${round(long_term, 2)}')
+            print(f"Short term gain/loss ${round(data.loc[data['date'] >= one_year_prior, 'gain'].sum(), 2)}")
+            print(f"Long term gain/loss ${round(data.loc[data['date'] < one_year_prior, 'gain'].sum(), 2)}")
         if args.symbol | args.nosummary:
             symbols: list[str] = data['symbol'].str.split(',\s*').explode().unique().tolist()
             symbols_gain: list[float] = []
