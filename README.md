@@ -17,4 +17,4 @@ options:
 
 File required
 
-Python 3 required. Tested on 3.11 and 3.12.
+Python 3 and pandas required. Tested on 3.11 and 3.12.
