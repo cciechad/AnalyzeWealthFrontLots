@@ -33,8 +33,8 @@ def main() -> None:
                                                  names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value',
                                                         'gain'])
         data['date'] = pandas.to_datetime(data['date'])
-        date_short = data['date'] >= one_year_prior
-        date_long = data['date'] < one_year_prior
+        date_short: bool = data['date'] >= one_year_prior
+        date_long: bool = data['date'] < one_year_prior
         if not args.no_summary:
             print(f"Net gain/loss {fmt_dollar(data['gain'].sum())}")
             print(f"Net short term gain/loss {fmt_dollar(data.loc[date_short, 'gain'].sum())}")
