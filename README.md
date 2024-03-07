@@ -17,4 +17,4 @@ options:
 
 File required
 
-Python 3.12 required
+Python 3 required
