@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def fmt_dollar(amount: float) -> str:
+def format_dollar(amount: float) -> str:
     formatted_absolute_amount: str = '${:,.2f}'.format(abs(amount))
     if round(amount, 2) < 0:
         return f'-{formatted_absolute_amount}'
@@ -37,11 +37,11 @@ def main() -> None:
         is_long: bool = data['date'] < one_year_prior
         if not args.no_summary:
             is_loss: bool = data['gain'] < 0
-            print(f"Net gain/loss {fmt_dollar(data['gain'].sum())}")
-            print(f"Net short term gain/loss {fmt_dollar(data.loc[is_short, 'gain'].sum())}")
-            print(f"Net long term gain/loss {fmt_dollar(data.loc[is_long, 'gain'].sum())}")
-            print(f"Total short term losses {fmt_dollar(data.loc[is_short & is_loss, 'gain'].sum())}")
-            print(f"Total long term losses {fmt_dollar(data.loc[is_long & is_loss, 'gain'].sum())}")
+            print(f"Net gain/loss {format_dollar(data['gain'].sum())}")
+            print(f"Net short term gain/loss {format_dollar(data.loc[is_short, 'gain'].sum())}")
+            print(f"Net long term gain/loss {format_dollar(data.loc[is_long, 'gain'].sum())}")
+            print(f"Total short term losses {format_dollar(data.loc[is_short & is_loss, 'gain'].sum())}")
+            print(f"Total long term losses {format_dollar(data.loc[is_long & is_loss, 'gain'].sum())}")
         if args.symbol | args.no_summary:
             symbols: list[str] = data['symbol'].explode().unique().tolist()
             symbols_net: list[float] = []
@@ -55,13 +55,13 @@ def main() -> None:
             symbols_range: range = range(len(symbols))
             symbols_dict: dict = {symbols[i]: symbols_net[i] for i in symbols_range}
             print('Net gain/loss per symbol')
-            print("\n".join(f"{k}\t{fmt_dollar(v)}" for k, v in symbols_dict.items()))
+            print("\n".join(f"{k}\t{format_dollar(v)}" for k, v in symbols_dict.items()))
             symbols_short_dict: dict = {symbols[i]: symbols_net_short[i] for i in symbols_range}
             print('Net short term per symbol')
-            print("\n".join(f"{k}\t{fmt_dollar(v)}" for k, v in symbols_short_dict.items()))
+            print("\n".join(f"{k}\t{format_dollar(v)}" for k, v in symbols_short_dict.items()))
             symbols_long_dict: dict = {symbols[i]: symbols_net_long[i] for i in symbols_range}
             print('Net long term per symbol')
-            print("\n".join(f"{k}\t{fmt_dollar(v)}" for k, v in symbols_long_dict.items()))
+            print("\n".join(f"{k}\t{format_dollar(v)}" for k, v in symbols_long_dict.items()))
 
 
 if __name__ == '__main__':
