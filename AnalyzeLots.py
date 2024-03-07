@@ -44,22 +44,22 @@ def main() -> None:
             print(f"Total long term losses {fmt_dollar(data.loc[is_long & is_loss, 'gain'].sum())}")
         if args.symbol | args.no_summary:
             symbols: list[str] = data['symbol'].explode().unique().tolist()
-            symbols_gain: list[float] = []
-            symbols_gain_short: list[float] = []
-            symbols_gain_long: list[float] = []
+            symbols_net: list[float] = []
+            symbols_net_short: list[float] = []
+            symbols_net_long: list[float] = []
             for iter_symbol in symbols:
                 is_iter_symbol: bool = data['symbol'] == iter_symbol
-                symbols_gain.append(data.loc[is_iter_symbol, 'gain'].sum())
-                symbols_gain_long.append(data.loc[is_iter_symbol & is_long, 'gain'].sum(0))
-                symbols_gain_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum(0))
+                symbols_net.append(data.loc[is_iter_symbol, 'gain'].sum())
+                symbols_net_long.append(data.loc[is_iter_symbol & is_long, 'gain'].sum(0))
+                symbols_net_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum(0))
             symbols_range: range = range(len(symbols))
-            symbols_dict: dict = {symbols[i]: symbols_gain[i] for i in symbols_range}
+            symbols_dict: dict = {symbols[i]: symbols_net[i] for i in symbols_range}
             print('Net gain/loss per symbol')
             print("\n".join(f"{k}\t{fmt_dollar(v)}" for k, v in symbols_dict.items()))
-            symbols_short_dict: dict = {symbols[i]: symbols_gain_short[i] for i in symbols_range}
+            symbols_short_dict: dict = {symbols[i]: symbols_net_short[i] for i in symbols_range}
             print('Net short term per symbol')
             print("\n".join(f"{k}\t{fmt_dollar(v)}" for k, v in symbols_short_dict.items()))
-            symbols_long_dict: dict = {symbols[i]: symbols_gain_long[i] for i in symbols_range}
+            symbols_long_dict: dict = {symbols[i]: symbols_net_long[i] for i in symbols_range}
             print('Net long term per symbol')
             print("\n".join(f"{k}\t{fmt_dollar(v)}" for k, v in symbols_long_dict.items()))
 
