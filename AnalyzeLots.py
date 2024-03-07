@@ -10,16 +10,16 @@ def parse_args() -> argparse.Namespace:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="Analyze Wealthfront cost-basis data. Displays net short/long term gains/losses and total short/long term losses by default.",
         epilog="File required")
-    parser.add_argument(
-        '-s', '--symbol', help='Display net gain/loss by symbol and net short/long-term gain/loss per symbol',
-        action='store_true')
+    parser.add_argument('-s', '--symbol',
+                        help='Display net gain/loss by symbol and net short/long-term gain/loss per symbol',
+                        action='store_true')
     parser.add_argument('-n', '--no-summary', help='No summary', action='store_true')
     parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
     return parser.parse_args()
 
 
 def fmt_dollar(amount: float) -> str:
-    formatted_absolute_amount = '${:,.2f}'.format(abs(amount))
+    formatted_absolute_amount: str = '${:,.2f}'.format(abs(amount))
     if round(amount, 2) < 0:
         return f'-{formatted_absolute_amount}'
     return formatted_absolute_amount
@@ -29,8 +29,9 @@ def main() -> None:
     args: argparse.Namespace = parse_args()
     one_year_prior: datetime = datetime.now() - timedelta(days=365)
     if args.file.is_file():
-        data: pandas.DataFrame = pandas.read_csv(
-            args.file, header=1, names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
+        data: pandas.DataFrame = pandas.read_csv(args.file, header=1,
+                                                 names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value',
+                                                        'gain'])
         data['date'] = pandas.to_datetime(data['date'])
         if not args.no_summary:
             print(f"Net gain/loss {fmt_dollar(data['gain'].sum())}")
