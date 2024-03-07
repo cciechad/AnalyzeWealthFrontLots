@@ -47,9 +47,10 @@ def main() -> None:
             symbols_gain_short: list[float] = []
             symbols_gain_long: list[float] = []
             for iter_symbol in symbols:
-                symbols_gain.append(data.loc[data['symbol'] == iter_symbol, 'gain'].sum())
-                symbols_gain_long.append(data.loc[(data['symbol'] == iter_symbol) & date_long, 'gain'].sum(0))
-                symbols_gain_short.append(data.loc[(data['symbol'] == iter_symbol) & date_short, 'gain'].sum(0))
+                is_iter_symbol: bool = data['symbol'] == iter_symbol
+                symbols_gain.append(data.loc[is_iter_symbol, 'gain'].sum())
+                symbols_gain_long.append(data.loc[is_iter_symbol & date_long, 'gain'].sum(0))
+                symbols_gain_short.append(data.loc[is_iter_symbol & date_short, 'gain'].sum(0))
             symbols_range: range = range(len(symbols))
             symbols_dict: dict = {symbols[i]: symbols_gain[i] for i in symbols_range}
             print('Net gain/loss per symbol')
