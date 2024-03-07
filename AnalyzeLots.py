@@ -33,16 +33,18 @@ def main() -> None:
                                                  names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value',
                                                         'gain'])
         data['date'] = pandas.to_datetime(data['date'])
+        date_short = data['date'] >= one_year_prior
+        date_long = data['date'] < one_year_prior
         if not args.no_summary:
             print(f"Net gain/loss {fmt_dollar(data['gain'].sum())}")
-            print(f"Net short term gain/loss {fmt_dollar(data.loc[data['date'] >= one_year_prior, 'gain'].sum())}")
-            print(f"Net long term gain/loss {fmt_dollar(data.loc[data['date'] < one_year_prior, 'gain'].sum())}")
+            print(f"Net short term gain/loss {fmt_dollar(data.loc[date_short, 'gain'].sum())}")
+            print(f"Net long term gain/loss {fmt_dollar(data.loc[date_long, 'gain'].sum())}")
             print(
                 f"Total short term losses {fmt_dollar(
-                    data.loc[(data['date'] >= one_year_prior) & (data['gain'] < 0), 'gain'].sum())}")
+                    data.loc[date_short & (data['gain'] < 0), 'gain'].sum())}")
             print(
                 f"Total long term losses {fmt_dollar(
-                    data.loc[(data['date'] < one_year_prior) & (data['gain'] < 0), 'gain'].sum())}")
+                    data.loc[date_long & (data['gain'] < 0), 'gain'].sum())}")
         if args.symbol | args.no_summary:
             symbols: list[str] = data['symbol'].explode().unique().tolist()
             symbols_gain: list[float] = []
@@ -51,9 +53,9 @@ def main() -> None:
             for iter_symbol in symbols:
                 symbols_gain.append(data.loc[data['symbol'] == iter_symbol, 'gain'].sum())
                 symbols_gain_long.append(
-                    data.loc[(data['symbol'] == iter_symbol) & (data['date'] < one_year_prior), 'gain'].sum(0))
+                    data.loc[(data['symbol'] == iter_symbol) & date_long, 'gain'].sum(0))
                 symbols_gain_short.append(
-                    data.loc[(data['symbol'] == iter_symbol) & (data['date'] >= one_year_prior), 'gain'].sum(0))
+                    data.loc[(data['symbol'] == iter_symbol) & date_short, 'gain'].sum(0))
             symbols_range: range = range(len(symbols))
             symbols_dict: dict = {symbols[i]: symbols_gain[i] for i in symbols_range}
             print('Net gain/loss per symbol')
