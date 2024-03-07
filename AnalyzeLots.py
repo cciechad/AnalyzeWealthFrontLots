@@ -8,7 +8,8 @@ import pandas
 
 def parse_args() -> argparse.Namespace:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="Analyze Wealthfront cost-basis data. Displays net short/long term gains/losses and total short/long term losses by default.",
+        description="Analyze Wealthfront cost-basis data. Displays net short/long term gains/losses and total "
+                    "short/long term losses by default.",
         epilog="File required")
     parser.add_argument('-s', '--symbol',
                         help='Display net gain/loss by symbol and net short/long-term gain/loss per symbol',
