@@ -36,12 +36,12 @@ def main() -> None:
         date_short: bool = data['date'] >= one_year_prior
         date_long: bool = data['date'] < one_year_prior
         if not args.no_summary:
-            gain_is_negative: bool = data['gain'] < 0
+            is_loss: bool = data['gain'] < 0
             print(f"Net gain/loss {fmt_dollar(data['gain'].sum())}")
             print(f"Net short term gain/loss {fmt_dollar(data.loc[date_short, 'gain'].sum())}")
             print(f"Net long term gain/loss {fmt_dollar(data.loc[date_long, 'gain'].sum())}")
-            print(f"Total short term losses {fmt_dollar(data.loc[date_short & gain_is_negative, 'gain'].sum())}")
-            print(f"Total long term losses {fmt_dollar(data.loc[date_long & gain_is_negative, 'gain'].sum())}")
+            print(f"Total short term losses {fmt_dollar(data.loc[date_short & is_loss, 'gain'].sum())}")
+            print(f"Total long term losses {fmt_dollar(data.loc[date_long & is_loss, 'gain'].sum())}")
         if args.symbol | args.no_summary:
             symbols: list[str] = data['symbol'].explode().unique().tolist()
             symbols_gain: list[float] = []
