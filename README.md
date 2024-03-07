@@ -16,3 +16,5 @@ options:
   -f FILE, --file FILE  File to process
 
 File required
+
+Python 3.12 required
