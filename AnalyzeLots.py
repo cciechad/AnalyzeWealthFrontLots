@@ -54,13 +54,14 @@ def main() -> None:
                     data.loc[(data['symbol'] == iter_symbol) & (data['date'] < one_year_prior), 'gain'].sum(0))
                 symbols_gain_short.append(
                     data.loc[(data['symbol'] == iter_symbol) & (data['date'] >= one_year_prior), 'gain'].sum(0))
-            symbols_dict: dict = {symbols[i]: symbols_gain[i] for i in range(len(symbols))}
+            symbols_range: range = range(len(symbols))
+            symbols_dict: dict = {symbols[i]: symbols_gain[i] for i in symbols_range}
             print('Net gain/loss per symbol')
             print("\n".join(f"{k}\t{fmt_dollar(v)}" for k, v in symbols_dict.items()))
-            symbols_short_dict: dict = {symbols[i]: symbols_gain_short[i] for i in range(len(symbols))}
+            symbols_short_dict: dict = {symbols[i]: symbols_gain_short[i] for i in symbols_range}
             print('Net short term per symbol')
             print("\n".join(f"{k}\t{fmt_dollar(v)}" for k, v in symbols_short_dict.items()))
-            symbols_long_dict: dict = {symbols[i]: symbols_gain_long[i] for i in range(len(symbols))}
+            symbols_long_dict: dict = {symbols[i]: symbols_gain_long[i] for i in symbols_range}
             print('Net long term per symbol')
             print("\n".join(f"{k}\t{fmt_dollar(v)}" for k, v in symbols_long_dict.items()))
 
