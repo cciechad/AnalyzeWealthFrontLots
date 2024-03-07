@@ -20,9 +20,7 @@ def parse_args() -> argparse.Namespace:
 
 def format_dollar(amount: float) -> str:
     formatted_absolute_amount: str = '${:,.2f}'.format(abs(amount))
-    if round(amount, 2) < 0:
-        return f'-{formatted_absolute_amount}'
-    return formatted_absolute_amount
+    return f'-{formatted_absolute_amount}' if round(amount, 2) < 0 else formatted_absolute_amount
 
 
 def main() -> None:
