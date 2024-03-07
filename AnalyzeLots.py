@@ -9,8 +9,7 @@ import pandas
 def parse_args() -> argparse.Namespace:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="Analyze Wealthfront cost-basis data. Displays net short/long term gains/losses and total "
-                    "short/long term losses by default.",
-        epilog="File required")
+                    "short/long term losses by default.", epilog="File required")
     parser.add_argument('-s', '--symbol',
                         help='Display net gain/loss by symbol and net short/long-term gain/loss per symbol',
                         action='store_true')
@@ -39,9 +38,11 @@ def main() -> None:
             print(f"Net short term gain/loss {fmt_dollar(data.loc[data['date'] >= one_year_prior, 'gain'].sum())}")
             print(f"Net long term gain/loss {fmt_dollar(data.loc[data['date'] < one_year_prior, 'gain'].sum())}")
             print(
-                f"Total short term losses {fmt_dollar(data.loc[(data['date'] >= one_year_prior) & (data['gain'] < 0), 'gain'].sum())}")
+                f"Total short term losses {fmt_dollar(
+                    data.loc[(data['date'] >= one_year_prior) & (data['gain'] < 0), 'gain'].sum())}")
             print(
-                f"Total long term losses {fmt_dollar(data.loc[(data['date'] < one_year_prior) & (data['gain'] < 0), 'gain'].sum())}")
+                f"Total long term losses {fmt_dollar(
+                    data.loc[(data['date'] < one_year_prior) & (data['gain'] < 0), 'gain'].sum())}")
         if args.symbol | args.no_summary:
             symbols: list[str] = data['symbol'].explode().unique().tolist()
             symbols_gain: list[float] = []
