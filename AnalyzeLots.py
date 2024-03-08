@@ -13,7 +13,7 @@ def main() -> None:
                                                  names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value',
                                                         'gain'])
         data['date'] = pandas.to_datetime(data['date'])
-        one_year_prior: datetime = datetime.now() - timedelta(days=365)
+        one_year_prior: datetime = datetime.now() - timedelta(days=(365 - args.days))
         is_short: bool = data['date'] >= one_year_prior
         is_long: bool = data['date'] < one_year_prior
         if not args.no_summary:
@@ -56,6 +56,7 @@ def parse_args() -> argparse.Namespace:
                         action='store_true')
     parser.add_argument('-n', '--no-summary', help='No summary', action='store_true')
     parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
+    parser.add_argument('-d', '--days', help='Show results for number of days in the future', type=int, default=0)
     return parser.parse_args()
 
 
