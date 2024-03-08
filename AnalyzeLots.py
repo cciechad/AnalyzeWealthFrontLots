@@ -27,6 +27,7 @@ def main() -> None:
             print(f"Total long term losses {format_dollar(data.loc[is_long & is_loss, 'gain'].sum())}")
         if args.symbol | args.no_summary:
             symbols: list[str] = data['symbol'].explode().unique().tolist()
+            symbols_name: list[str] = data['display_name'].explode().unique().tolist()
             symbols_net: list[float] = []
             symbols_net_short: list[float] = []
             symbols_net_long: list[float] = []
@@ -37,11 +38,11 @@ def main() -> None:
                 symbols_net_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum(0))
             symbols_range: range = range(len(symbols))
             print('Net gain/loss per symbol')
-            symbols_net_print(symbols, symbols_net, symbols_range)
+            symbols_net_print(symbols, symbols_name, symbols_net, symbols_range, args.verbose)
             print('Net short term per symbol')
-            symbols_net_print(symbols, symbols_net_short, symbols_range)
+            symbols_net_print(symbols, symbols_name, symbols_net_short, symbols_range, args.verbose)
             print('Net long term per symbol')
-            symbols_net_print(symbols, symbols_net_long, symbols_range)
+            symbols_net_print(symbols, symbols_name, symbols_net_long, symbols_range, args.verbose)
     else:
         print(f'{args.file} is not a readable file.')
     return
@@ -57,12 +58,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('-n', '--no-summary', help='No summary', action='store_true')
     parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
     parser.add_argument('-d', '--days', help='Show results for number of days in the future', type=int, default=0)
+    parser.add_argument('-v', '--verbose', help='Display ETF descriptions', action='store_true')
     return parser.parse_args()
 
 
-def symbols_net_print(symbols: list[str], net: list[float], symbols_range: range) -> None:
-    symbols_dict: dict = {symbols[i]: net[i] for i in symbols_range}
-    print("\n".join(f"{k}\t{format_dollar(v)}" for k, v in symbols_dict.items()))
+def symbols_net_print(symbols: list[str], name: list[str], net: list[float], symbols_range: range,
+                      display_name: bool) -> None:
+    symbols_dict: dict = {symbols[i]: (name[i], net[i]) for i in symbols_range}
+    if display_name is True:
+        print("\n".join(f"{k:8s}{v[0]:42.42s}{format_dollar(v[1]):>21s}" for k, v in symbols_dict.items()))
+    else:
+        print("\n".join(f"{k}\t{format_dollar(v[1])}" for k, v in symbols_dict.items()))
     return
 
 

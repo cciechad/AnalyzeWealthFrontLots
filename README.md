@@ -17,6 +17,9 @@ options:
 
   -d DAYS, --days DAYS  Show results for number of days in the future
 
+  -v, --verbose         Display ETF descriptions
+
+
 File required
 
 Python 3 and pandas required. Tested on 3.11 and 3.12.
