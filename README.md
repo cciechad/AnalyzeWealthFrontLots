@@ -19,7 +19,8 @@ options:
 
   -v, --verbose         Display ETF descriptions
 
+  -l, --live            Get live price from YF(experimental)
 
 File required
 
-Python 3 and pandas required. Tested on 3.11 and 3.12.
+Python 3, pandas and yfinance required. Tested on 3.11 and 3.12.

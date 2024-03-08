@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import argparse
 from datetime import datetime, timedelta
+from functools import lru_cache
 from pathlib import Path
 
 import pandas
+import yfinance as yf
 
 
 def main() -> None:
@@ -16,6 +18,9 @@ def main() -> None:
         one_year_prior: datetime = datetime.now() - timedelta(days=(365 - args.days))
         is_short: bool = data['date'] >= one_year_prior
         is_long: bool = data['date'] < one_year_prior
+        if args.live:
+            data['value'] = update_value(data['symbol'], data['quantity'])
+            data['gain'] = data['value'] - data['cost']
         if not args.no_summary:
             is_loss: bool = data['gain'] < 0
             print(f"Net gain/loss {format_dollar(data['gain'].sum())}")
@@ -59,6 +64,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
     parser.add_argument('-d', '--days', help='Show results for number of days in the future', type=int, default=0)
     parser.add_argument('-v', '--verbose', help='Display ETF descriptions', action='store_true')
+    parser.add_argument('-l', '--live', help='Get live price from YF(experimental)', action='store_true')
     return parser.parse_args()
 
 
@@ -75,6 +81,19 @@ def symbols_net_print(symbols: list[str], name: list[str], net: list[float], sym
 def format_dollar(amount: float) -> str:
     formatted_absolute_amount: str = '${:,.2f}'.format(abs(amount))
     return f'-{formatted_absolute_amount}' if round(amount, 2) < 0 else formatted_absolute_amount
+
+
+def update_value(symbols: list[str], quantities: list[int]) -> list[float]:
+    value_list: list[float] = []
+    for symbol, quantity in zip(symbols, quantities):
+        value_list.append(quantity * get_price(symbol))
+    return value_list
+
+
+@lru_cache(maxsize=None)
+def get_price(symbol: str) -> float:
+    ticker = yf.Ticker(str.upper(symbol)).fast_info
+    return ticker['lastPrice']
 
 
 if __name__ == '__main__':
