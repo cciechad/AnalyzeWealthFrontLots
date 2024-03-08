@@ -15,6 +15,8 @@ options:
   
   -f FILE, --file FILE  File to process
 
+  -d DAYS, --days DAYS  Show results for number of days in the future
+
 File required
 
 Python 3 and pandas required. Tested on 3.11 and 3.12.
