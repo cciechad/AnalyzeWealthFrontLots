@@ -4,17 +4,17 @@ from datetime import datetime, timedelta
 from functools import cache
 from pathlib import Path
 
-import pandas
+import pandas as pd
 import yfinance as yf
 
 
 def main() -> None:
     args: argparse.Namespace = parse_args()
     if args.file.is_file():
-        data: pandas.DataFrame = pandas.read_csv(args.file, header=1,
-                                                 names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value',
-                                                        'gain'])
-        data['date'] = pandas.to_datetime(data['date'])
+        data: pd.DataFrame = pd.read_csv(args.file, header=1,
+                                         names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value',
+                                                'gain'])
+        data['date'] = pd.to_datetime(data['date'])
         one_year_prior: datetime = datetime.now() - timedelta(days=(365 - args.days))
         is_short: bool = data['date'] >= one_year_prior
         is_long: bool = data['date'] < one_year_prior
@@ -83,7 +83,7 @@ def format_dollar(amount: float) -> str:
     return f'-{formatted_absolute_amount}' if round(amount, 2) < 0 else formatted_absolute_amount
 
 
-def update_value(symbols: list[str], quantities: list[int]) -> list[float]:
+def update_value(symbols: pd.Series, quantities: pd.Series) -> list[float]:
     value_list: list[float] = []
     for symbol, quantity in zip(symbols, quantities):
         value_list.append(quantity * get_price(symbol))
