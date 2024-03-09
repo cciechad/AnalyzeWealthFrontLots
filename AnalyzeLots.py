@@ -11,7 +11,7 @@ import yfinance as yf
 def main() -> None:
     args: argparse.Namespace = parse_args()
     if args.file.is_file():
-        data: pd.DataFrame = pd.read_csv(args.file, header=1,
+        data: pd.DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True,
                                          names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
         data['date'] = pd.to_datetime(data['date'])
         one_year_prior: datetime = datetime.now() - timedelta(days=(365 - args.days))
@@ -67,10 +67,10 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def symbols_net_print(symbols: list[str], name: list[str], net: list[float], symbols_range: range,
-                      display_name: bool) -> None:
-    symbols_dict: dict = {symbols[i]: (name[i], net[i]) for i in symbols_range}
-    if display_name is True:
+def symbols_net_print(symbols: list[str], names: list[str], net: list[float], symbols_range: range,
+                      verbose: bool) -> None:
+    symbols_dict: dict = {symbols[i]: (names[i], net[i]) for i in symbols_range}
+    if verbose is True:
         print("\n".join(f"{k:8s}{v[0]:42.42s}{format_dollar(v[1]):>21s}" for k, v in symbols_dict.items()))
     else:
         print("\n".join(f"{k}\t{format_dollar(v[1])}" for k, v in symbols_dict.items()))
