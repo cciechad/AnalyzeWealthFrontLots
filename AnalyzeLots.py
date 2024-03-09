@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import argparse
 from datetime import datetime, timedelta
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 
 import pandas
@@ -90,7 +90,7 @@ def update_value(symbols: list[str], quantities: list[int]) -> list[float]:
     return value_list
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_price(symbol: str) -> float:
     ticker = yf.Ticker(str.upper(symbol)).fast_info
     return ticker['lastPrice']
