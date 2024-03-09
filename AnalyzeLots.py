@@ -5,7 +5,6 @@ from functools import cache
 from pathlib import Path
 
 import pandas as pd
-from yfinance import Ticker
 
 
 def main() -> None:
@@ -91,6 +90,7 @@ def update_value(symbols: pd.Series, quantities: pd.Series) -> pd.Series:
 
 @cache
 def get_price(symbol: str) -> float:
+    from yfinance import Ticker
     ticker = Ticker(str.upper(symbol)).fast_info
     return ticker['lastPrice']
 
