@@ -18,7 +18,7 @@ def main() -> None:
         is_short: bool = data['date'] >= one_year_prior
         is_long: bool = data['date'] < one_year_prior
         if args.live:
-            data['value'] = update_value(data['symbol'], data['quantity'])
+            data = data.assign(value=lambda x: update_value(x['symbol'], x['quantity']))
             data['gain'] = data['value'] - data['cost']
         if not args.no_summary:
             is_loss: bool = data['gain'] < 0
@@ -82,11 +82,11 @@ def format_dollar(amount: float) -> str:
     return f'-{formatted_absolute_amount}' if round(amount, 2) < 0 else formatted_absolute_amount
 
 
-def update_value(symbols: pd.Series, quantities: pd.Series) -> list[float]:
+def update_value(symbols: pd.Series, quantities: pd.Series) -> pd.Series:
     value_list: list[float] = []
     for symbol, quantity in zip(symbols, quantities):
         value_list.append(quantity * get_price(symbol))
-    return value_list
+    return pd.Series(value_list)
 
 
 @cache
