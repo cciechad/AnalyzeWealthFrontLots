@@ -1,7 +1,7 @@
 # AnalyzeWealthFrontLots
 Python script to analyze Wealthfront open tax lots CSV download and display long-term and short-term gains/losses.
 
-usage: AnalyzeLots.py [-h] [-s] [-n] -f FILE [-d DAYS]
+usage: AnalyzeLots.py [-h] [-s] [-n] [-v] [-l] -f FILE [-d DAYS]
 
 Analyze Wealthfront cost-basis data. Displays net short/long term gains/losses and total short/long term losses by default.
 
