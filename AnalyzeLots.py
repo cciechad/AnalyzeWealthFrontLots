@@ -15,7 +15,7 @@ def main() -> None:
                                          names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
         one_year_prior: datetime = datetime.now() - timedelta(days=(365 - args.days))
         is_short: pd.Series[bool] = data['date'] >= one_year_prior
-        is_long: pd.Series[bool] = data['date'] < one_year_prior
+        is_long: pd.Series[bool] = ~is_short
         if args.live:
             data = data.assign(value=lambda x: update_value(x['symbol'], x['quantity']))
             data['gain'] = data['value'] - data['cost']
