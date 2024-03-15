@@ -14,13 +14,13 @@ def main() -> None:
                                          dtype={'quantity': int}, parse_dates=['date'],
                                          names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
         one_year_prior: datetime = datetime.now() - timedelta(days=(365 - args.days))
-        is_short: bool = data['date'] >= one_year_prior
-        is_long: bool = data['date'] < one_year_prior
+        is_short: pd.Series[bool] = data['date'] >= one_year_prior
+        is_long: pd.Series[bool] = data['date'] < one_year_prior
         if args.live:
             data = data.assign(value=lambda x: update_value(x['symbol'], x['quantity']))
             data['gain'] = data['value'] - data['cost']
         if not args.no_summary:
-            is_loss: bool = data['gain'] < 0
+            is_loss: pd.Series[bool] = data['gain'] < 0
             print(f"Net gain/loss {format_dollar(data['gain'].sum())}")
             print(f"Net short term gain/loss {format_dollar(data.loc[is_short, 'gain'].sum())}")
             print(f"Net long term gain/loss {format_dollar(data.loc[is_long, 'gain'].sum())}")
@@ -36,7 +36,7 @@ def main() -> None:
             symbols_net_short: list[float] = []
             symbols_net_long: list[float] = []
             for iter_symbol in symbols:
-                is_iter_symbol: bool = data['symbol'] == iter_symbol
+                is_iter_symbol: pd.Series[bool] = data['symbol'] == iter_symbol
                 symbols_net.append(data.loc[is_iter_symbol, 'gain'].sum())
                 symbols_net_long.append(data.loc[is_iter_symbol & is_long, 'gain'].sum(0))
                 symbols_net_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum(0))
