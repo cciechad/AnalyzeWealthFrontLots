@@ -11,9 +11,8 @@ def main() -> None:
     args: argparse.Namespace = parse_args()
     if args.file.is_file():
         data: pd.DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True,
-                                         dtype={'quantity': int},
+                                         dtype={'quantity': int}, parse_dates=['date'],
                                          names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
-        data['date'] = pd.to_datetime(data['date'])
         one_year_prior: datetime = datetime.now() - timedelta(days=(365 - args.days))
         is_short: bool = data['date'] >= one_year_prior
         is_long: bool = data['date'] < one_year_prior
