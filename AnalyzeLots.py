@@ -70,7 +70,7 @@ def parse_args() -> argparse.Namespace:
 def symbols_net_print(symbols: list[str], names: list[str], net: list[float], symbols_range: range,
                       verbose: bool) -> None:
     symbols_dict: dict = {symbols[i]: (names[i], net[i]) for i in symbols_range}
-    if verbose is True:
+    if verbose:
         print("\n".join(f"{k:8s}{v[0]:42.42s}{format_dollar(v[1]):>21s}" for k, v in symbols_dict.items()))
     else:
         print("\n".join(f"{k}\t{format_dollar(v[1])}" for k, v in symbols_dict.items()))
