@@ -56,9 +56,8 @@ def parse_args() -> argparse.Namespace:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="Analyze Wealthfront cost-basis data. Displays net short/long term gains/losses and total "
                     "short/long term losses by default.", epilog="File required")
-    parser.add_argument('-s', '--symbol',
-                        help='Display net gain/loss by symbol and net short/long-term gain/loss per symbol',
-                        action='store_true')
+    parser.add_argument('-s', '--symbol', action='store_true',
+                        help='Display net gain/loss by symbol and net short/long-term gain/loss per symbol')
     parser.add_argument('-n', '--no-summary', help='No summary', action='store_true')
     parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
     parser.add_argument('-d', '--days', help='Show results for number of days in the future', type=int, default=0)
