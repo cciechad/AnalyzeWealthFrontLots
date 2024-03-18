@@ -13,8 +13,7 @@ def main() -> None:
         data: pd.DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True,
                                          dtype={'quantity': int}, parse_dates=['date'],
                                          names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
-        one_year_prior: datetime = datetime.now() - timedelta(days=(365 - args.days))
-        is_short: pd.Series[bool] = data['date'] > one_year_prior
+        is_short: pd.Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: pd.Series[bool] = ~is_short
         if args.live:
             data = data.assign(value=lambda x: update_value(x['symbol'], x['quantity']))
@@ -66,8 +65,8 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def symbols_net_print(symbols: list[str], names: list[str], net: list[float], symbols_range: range,
-                      verbose: bool) -> None:
+def symbols_net_print(symbols: list[str], names: list[str], net: list[float], symbols_range: range, verbose: bool
+                      ) -> None:
     symbols_dict: dict = {symbols[i]: (names[i], net[i]) for i in symbols_range}
     if verbose:
         print("\n".join(f"{k:8s}{v[0]:42.42s}{format_dollar(v[1]):>21s}" for k, v in symbols_dict.items()))
