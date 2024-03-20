@@ -16,9 +16,9 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Package Application
-      uses: JackMcKew/pyinstaller-action-windows@python3-10-pyinstaller-5-3
+      uses: JackMcKew/pyinstaller-action-windows@main
       with:
-        path:
+        path: AnalyzeLots.py
 
     - uses: actions/upload-artifact@v2
       with:
