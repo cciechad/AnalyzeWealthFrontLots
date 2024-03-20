@@ -20,12 +20,13 @@ def main() -> None:
             data['gain'] = data['value'] - data['cost']
         if not args.no_summary:
             is_loss: pd.Series[bool] = data['gain'] < 0
-            print(f"Net gain/loss {format_dollar(data['gain'].sum())}")
-            print(f"Net short term gain/loss {format_dollar(data.loc[is_short, 'gain'].sum())}")
-            print(f"Net long term gain/loss {format_dollar(data.loc[is_long, 'gain'].sum())}")
+            print(f"Total cost {format_dollar(data['cost'].sum())}")
             print(f"Total value {format_dollar(data['value'].sum())}")
             print(f"Short term total value {format_dollar(data.loc[is_short, 'value'].sum())}")
             print(f"Long term total value {format_dollar(data.loc[is_long, 'value'].sum())}")
+            print(f"Net gain/loss {format_dollar(data['gain'].sum())}")
+            print(f"Net short term gain/loss {format_dollar(data.loc[is_short, 'gain'].sum())}")
+            print(f"Net long term gain/loss {format_dollar(data.loc[is_long, 'gain'].sum())}")
             print(f"Total short term losses {format_dollar(data.loc[is_short & is_loss, 'gain'].sum())}")
             print(f"Total long term losses {format_dollar(data.loc[is_long & is_loss, 'gain'].sum())}")
         if args.symbol | args.no_summary:
