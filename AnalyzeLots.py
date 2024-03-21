@@ -90,7 +90,7 @@ def update_value(symbols: pd.Series, quantities: pd.Series) -> pd.Series:
 @cache
 def get_price(symbol: str) -> float:
     from yfinance import Ticker
-    ticker: Ticker.fast_info = Ticker(str.upper(symbol)).fast_info
+    ticker: Ticker.fast_info = Ticker(symbol).fast_info
     return ticker['lastPrice']
 
 
