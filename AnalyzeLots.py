@@ -67,13 +67,13 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def symbols_net_print(symbols: list[str], names: list[str], net: list[float], symbols_range: range, verbose: bool
+def symbols_net_print(symbols: list[str], names: list[str], nets: list[float], symbols_range: range, verbose: bool
                       ) -> None:
-    symbols_dict: dict = {symbols[i]: (names[i], net[i]) for i in symbols_range}
+    net_pairs: dict[str, tuple[str, float]] = {symbols[i]: (names[i], nets[i]) for i in symbols_range}
     if verbose:
-        print("\n".join(f"{k:8s}{v[0]:42.42s}{format_dollar(v[1]):>21s}" for k, v in symbols_dict.items()))
+        print("\n".join(f"{k:8s}{v[0]:42.42s}{format_dollar(v[1]):>21s}" for k, v in net_pairs.items()))
     else:
-        print("\n".join(f"{k}\t{format_dollar(v[1])}" for k, v in symbols_dict.items()))
+        print("\n".join(f"{k}\t{format_dollar(v[1])}" for k, v in net_pairs.items()))
     return
 
 
@@ -83,8 +83,8 @@ def format_dollar(amount: float) -> str:
 
 
 def update_value(symbols: pd.Series, quantities: pd.Series) -> pd.Series:
-    value_list: list[float] = [(get_price(symbol) * quantity) for symbol, quantity in zip(symbols, quantities)]
-    return pd.Series(value_list, dtype='float')
+    values: list[float] = [(get_price(symbol) * quantity) for symbol, quantity in zip(symbols, quantities)]
+    return pd.Series(values, dtype='float')
 
 
 @cache
