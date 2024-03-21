@@ -9,6 +9,7 @@ import pandas as pd
 
 def main() -> None:
     args: argparse.Namespace = parse_args()
+    pd.options.mode.copy_on_write = True
     if args.file.is_file():
         data: pd.DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True,
                                          dtype={'quantity': int}, parse_dates=['date'],
