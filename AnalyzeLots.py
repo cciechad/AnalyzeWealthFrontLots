@@ -15,8 +15,7 @@ def main() -> None:
         data: pd.DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True, parse_dates=['date'],
                                          names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'],
                                          dtype={'quantity': np.uint16, 'cost': np.float32, 'value': np.float32,
-                                                'gain': np.float32, 'symbol': pd.CategoricalDtype(),
-                                                'display_name': pd.CategoricalDtype()})
+                                                'gain': np.float32, 'symbol': 'category', 'display_name': 'category'})
         is_short: pd.Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: pd.Series[bool] = ~is_short
         if args.live:
