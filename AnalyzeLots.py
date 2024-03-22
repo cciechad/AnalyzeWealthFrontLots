@@ -13,9 +13,10 @@ def main() -> None:
     pd.options.mode.copy_on_write = True
     if args.file.is_file():
         data: pd.DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True, parse_dates=['date'],
-                                         dtype={'quantity': np.uint32, 'cost': np.float32, 'value': np.float32,
-                                                'gain': np.float32},
-                                         names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
+                                         names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'],
+                                         dtype={'quantity': np.uint16, 'cost': np.float32, 'value': np.float32,
+                                                'gain': np.float32, 'symbol': pd.CategoricalDtype(),
+                                                'display_name': pd.CategoricalDtype()})
         is_short: pd.Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: pd.Series[bool] = ~is_short
         if args.live:
