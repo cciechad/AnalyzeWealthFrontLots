@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from functools import cache
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 
@@ -11,8 +12,9 @@ def main() -> None:
     args: argparse.Namespace = parse_args()
     pd.options.mode.copy_on_write = True
     if args.file.is_file():
-        data: pd.DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True,
-                                         dtype={'quantity': int}, parse_dates=['date'],
+        data: pd.DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True, parse_dates=['date'],
+                                         dtype={'quantity': np.uint32, 'cost': np.float32, 'value': np.float32,
+                                                'gain': np.float32},
                                          names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'])
         is_short: pd.Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: pd.Series[bool] = ~is_short
@@ -67,8 +69,8 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def symbols_net_print(symbols: list[str], names: list[str], nets: list[float], symbols_range: range, verbose: bool
-                      ) -> None:
+def symbols_net_print(symbols: list[str], names: list[str], nets: list[float], symbols_range: range,
+                      verbose: bool) -> None:
     net_pairs: dict[str, tuple[str, float]] = {symbols[i]: (names[i], nets[i]) for i in symbols_range}
     if verbose:
         print("\n".join(f"{k:8s}{v[0]:42.42s}{format_dollar(v[1]):>21s}" for k, v in net_pairs.items()))
