@@ -87,7 +87,7 @@ def format_dollar(amount: float) -> str:
 
 def update_value(symbols: pd.Series, quantities: pd.Series) -> pd.Series:
     values: list[float] = [(get_price(symbol) * quantity) for symbol, quantity in zip(symbols, quantities)]
-    return pd.Series(values, dtype='float')
+    return pd.Series(values, dtype='float32')
 
 
 @cache
