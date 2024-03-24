@@ -35,8 +35,8 @@ def main() -> None:
             print(f"Total long term losses {format_dollar(data.loc[is_long & is_loss, 'gain'].sum())}")
             print(f"{','.join(data.loc[is_long & is_loss, 'symbol'].unique().tolist())}")
         if args.symbol | args.no_summary:
-            symbols: list[str] = data['symbol'].explode().unique().tolist()
-            symbols_name: list[str] = data['display_name'].explode().unique().tolist()
+            symbols: list[str] = data['symbol'].unique().tolist()
+            symbols_name: list[str] = data['display_name'].unique().tolist()
             symbols_net: list[float] = []
             symbols_net_short: list[float] = []
             symbols_net_long: list[float] = []
