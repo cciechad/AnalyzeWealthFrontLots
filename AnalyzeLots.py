@@ -30,10 +30,14 @@ def main() -> None:
             print(f"Net gain/loss {format_dollar(data['gain'].sum())}")
             print(f"Net short term gain/loss {format_dollar(data.loc[is_short, 'gain'].sum())}")
             print(f"Net long term gain/loss {format_dollar(data.loc[is_long, 'gain'].sum())}")
-            print(f"Total short term losses {format_dollar(data.loc[is_short & is_loss, 'gain'].sum())}")
-            print(f"{','.join(data.loc[is_short & is_loss, 'symbol'].unique().tolist())}")
-            print(f"Total long term losses {format_dollar(data.loc[is_long & is_loss, 'gain'].sum())}")
-            print(f"{','.join(data.loc[is_long & is_loss, 'symbol'].unique().tolist())}")
+            print(f"Total short term losses "
+                  f"{format_dollar(total_short_losses := data.loc[is_short & is_loss, 'gain'].sum())}")
+            if total_short_losses != 0:
+                print(f"{','.join(data.loc[is_short & is_loss, 'symbol'].unique().tolist())}")
+            print(f"Total long term losses "
+                  f"{format_dollar(total_long_losses := data.loc[is_long & is_loss, 'gain'].sum())}")
+            if total_long_losses != 0:
+                print(f"{','.join(data.loc[is_long & is_loss, 'symbol'].unique().tolist())}")
         if args.symbol | args.no_summary:
             symbols: list[str] = data['symbol'].unique().tolist()
             symbols_name: list[str] = data['display_name'].unique().tolist()
