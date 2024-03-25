@@ -19,44 +19,52 @@ def main() -> None:
         is_long: pd.Series[bool] = ~is_short
         symbols: list[str] = data['symbol'].unique().tolist()
         if args.live:
-            data = live_update(data, symbols)
+            data: pd.DataFrame = live_update(data, symbols)
         if not args.no_summary:
-            is_loss: pd.Series[bool] = data['gain'] < 0
-            print(f"Total cost {format_dollar(data['cost'].sum())}")
-            print(f"Total value {format_dollar(data['value'].sum())}")
-            print(f"Short term total value {format_dollar(data.loc[is_short, 'value'].sum())}")
-            print(f"Long term total value {format_dollar(data.loc[is_long, 'value'].sum())}")
-            print(f"Net gain/loss {format_dollar(data['gain'].sum())}")
-            print(f"Net short term gain/loss {format_dollar(data.loc[is_short, 'gain'].sum())}")
-            print(f"Net long term gain/loss {format_dollar(data.loc[is_long, 'gain'].sum())}")
-            print(f"Total short term losses "
-                  f"{format_dollar(total_short_losses := data.loc[is_short & is_loss, 'gain'].sum())}")
-            if total_short_losses != 0:
-                print(f"{','.join(data.loc[is_short & is_loss, 'symbol'].unique().tolist())}")
-            print(f"Total long term losses "
-                  f"{format_dollar(total_long_losses := data.loc[is_long & is_loss, 'gain'].sum())}")
-            if total_long_losses != 0:
-                print(f"{','.join(data.loc[is_long & is_loss, 'symbol'].unique().tolist())}")
+            summary(data, is_long, is_short)
         if args.symbol | args.no_summary:
-            symbols_name: list[str] = data['display_name'].unique().tolist()
-            symbols_net: list[float] = []
-            symbols_net_short: list[float] = []
-            symbols_net_long: list[float] = []
-            for iter_symbol in symbols:
-                is_iter_symbol: pd.Series[bool] = data['symbol'] == iter_symbol
-                symbols_net.append(data.loc[is_iter_symbol, 'gain'].sum())
-                symbols_net_long.append(data.loc[is_iter_symbol & is_long, 'gain'].sum(0))
-                symbols_net_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum(0))
-            symbols_range: range = range(len(symbols))
-            print('Net gain/loss per symbol')
-            symbols_net_print(symbols, symbols_name, symbols_net, symbols_range, args.verbose)
-            print('Net short term gain/loss per symbol')
-            symbols_net_print(symbols, symbols_name, symbols_net_short, symbols_range, args.verbose)
-            print('Net long term gain/loss per symbol')
-            symbols_net_print(symbols, symbols_name, symbols_net_long, symbols_range, args.verbose)
+            by_symbol(args.verbose, data, is_long, is_short, symbols)
     else:
         print(f'{args.file} is not a readable file.')
     return
+
+
+def by_symbol(verbose: bool, data: pd.DataFrame, is_long: pd.Series, is_short: pd.Series, symbols: list[str]) -> None:
+    symbols_name: list[str] = data['display_name'].unique().tolist()
+    symbols_net: list[float] = []
+    symbols_net_short: list[float] = []
+    symbols_net_long: list[float] = []
+    for iter_symbol in symbols:
+        is_iter_symbol: pd.Series[bool] = data['symbol'] == iter_symbol
+        symbols_net.append(data.loc[is_iter_symbol, 'gain'].sum())
+        symbols_net_long.append(data.loc[is_iter_symbol & is_long, 'gain'].sum(0))
+        symbols_net_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum(0))
+    symbols_range: range = range(len(symbols))
+    print('Net gain/loss per symbol')
+    symbols_net_print(symbols, symbols_name, symbols_net, symbols_range, verbose)
+    print('Net short term gain/loss per symbol')
+    symbols_net_print(symbols, symbols_name, symbols_net_short, symbols_range, verbose)
+    print('Net long term gain/loss per symbol')
+    symbols_net_print(symbols, symbols_name, symbols_net_long, symbols_range, verbose)
+
+
+def summary(data: pd.DataFrame, is_long: pd.Series, is_short: pd.Series) -> None:
+    is_loss: pd.Series[bool] = data['gain'] < 0
+    print(f"Total cost {format_dollar(data['cost'].sum())}")
+    print(f"Total value {format_dollar(data['value'].sum())}")
+    print(f"Short term total value {format_dollar(data.loc[is_short, 'value'].sum())}")
+    print(f"Long term total value {format_dollar(data.loc[is_long, 'value'].sum())}")
+    print(f"Net gain/loss {format_dollar(data['gain'].sum())}")
+    print(f"Net short term gain/loss {format_dollar(data.loc[is_short, 'gain'].sum())}")
+    print(f"Net long term gain/loss {format_dollar(data.loc[is_long, 'gain'].sum())}")
+    print(f"Total short term losses "
+          f"{format_dollar(total_short_losses := data.loc[is_short & is_loss, 'gain'].sum())}")
+    if total_short_losses != 0:
+        print(f"{','.join(data.loc[is_short & is_loss, 'symbol'].unique().tolist())}")
+    print(f"Total long term losses "
+          f"{format_dollar(total_long_losses := data.loc[is_long & is_loss, 'gain'].sum())}")
+    if total_long_losses != 0:
+        print(f"{','.join(data.loc[is_long & is_loss, 'symbol'].unique().tolist())}")
 
 
 def live_update(data: pd.DataFrame, symbols: list[str]) -> pd.DataFrame:
