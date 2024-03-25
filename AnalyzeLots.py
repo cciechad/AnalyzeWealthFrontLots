@@ -19,10 +19,7 @@ def main() -> None:
         is_long: pd.Series[bool] = ~is_short
         symbols: list[str] = data['symbol'].unique().tolist()
         if args.live:
-            symbol_price: dict[str, float] = {symbol: get_price(symbol) for symbol in symbols}
-            data['price'] = data['symbol'].map(symbol_price).astype(np.float32)
-            data['value'] = data['quantity'] * data['price']
-            data['gain'] = data['value'] - data['cost']
+            data = live_update(data, symbols)
         if not args.no_summary:
             is_loss: pd.Series[bool] = data['gain'] < 0
             print(f"Total cost {format_dollar(data['cost'].sum())}")
@@ -60,6 +57,14 @@ def main() -> None:
     else:
         print(f'{args.file} is not a readable file.')
     return
+
+
+def live_update(data: pd.DataFrame, symbols: list[str]) -> pd.DataFrame:
+    symbol_price: dict[str, float] = {symbol: get_price(symbol) for symbol in symbols}
+    data['price'] = data['symbol'].map(symbol_price).astype(np.float32)
+    data['value'] = data['quantity'] * data['price']
+    data['gain'] = data['value'] - data['cost']
+    return data
 
 
 def parse_args() -> argparse.Namespace:
