@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import argparse
 from datetime import datetime, timedelta
-from functools import cache
 from pathlib import Path
 
 import numpy as np
@@ -18,8 +17,11 @@ def main() -> None:
                                                 'gain': np.float32, 'symbol': 'category', 'display_name': 'category'})
         is_short: pd.Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: pd.Series[bool] = ~is_short
+        symbols: list[str] = data['symbol'].unique().tolist()
         if args.live:
-            data = data.assign(value=lambda x: update_value(x['symbol'], x['quantity']))
+            symbol_price: dict[str, float] = {symbol: get_price(symbol) for symbol in symbols}
+            data['price'] = data['symbol'].map(symbol_price).astype(np.float32)
+            data['value'] = data['quantity'] * data['price']
             data['gain'] = data['value'] - data['cost']
         if not args.no_summary:
             is_loss: pd.Series[bool] = data['gain'] < 0
@@ -39,7 +41,6 @@ def main() -> None:
             if total_long_losses != 0:
                 print(f"{','.join(data.loc[is_long & is_loss, 'symbol'].unique().tolist())}")
         if args.symbol | args.no_summary:
-            symbols: list[str] = data['symbol'].unique().tolist()
             symbols_name: list[str] = data['display_name'].unique().tolist()
             symbols_net: list[float] = []
             symbols_net_short: list[float] = []
@@ -90,12 +91,6 @@ def format_dollar(amount: float) -> str:
     return f'-{formatted_absolute_amount}' if round(amount, 2) < 0 else formatted_absolute_amount
 
 
-def update_value(symbols: pd.Series, quantities: pd.Series) -> pd.Series:
-    values: list[float] = [(get_price(symbol) * quantity) for symbol, quantity in zip(symbols, quantities)]
-    return pd.Series(values, dtype='float32')
-
-
-@cache
 def get_price(symbol: str) -> float:
     from yfinance import Ticker
     ticker: Ticker.fast_info = Ticker(symbol).fast_info
