@@ -74,7 +74,7 @@ def live_update(data: pd.DataFrame, symbols: list[str]) -> pd.DataFrame:
     data['price'] = data['symbol'].map(symbol_price).astype(np.float32)
     data['value'] = data['quantity'] * data['price']
     data['gain'] = data['value'] - data['cost']
-    return data
+    return data.drop(columns=['price'])
 
 
 def parse_args() -> argparse.Namespace:
