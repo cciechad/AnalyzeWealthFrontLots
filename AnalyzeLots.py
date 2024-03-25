@@ -23,13 +23,13 @@ def main() -> None:
         if not args.no_summary:
             summary(data, is_long, is_short)
         if args.symbol | args.no_summary:
-            by_symbol(args.verbose, data, is_long, is_short, symbols)
+            by_symbol(data, symbols, is_long, is_short, args.verbose)
     else:
         print(f'{args.file} is not a readable file.')
     return
 
 
-def by_symbol(verbose: bool, data: pd.DataFrame, is_long: pd.Series, is_short: pd.Series, symbols: list[str]) -> None:
+def by_symbol(data: pd.DataFrame, symbols: list[str], is_long: pd.Series, is_short: pd.Series, verbose: bool) -> None:
     symbols_name: list[str] = data['display_name'].unique().tolist()
     symbols_net: list[float] = []
     symbols_net_short: list[float] = []
@@ -46,6 +46,7 @@ def by_symbol(verbose: bool, data: pd.DataFrame, is_long: pd.Series, is_short: p
     symbols_net_print(symbols, symbols_name, symbols_net_short, symbols_range, verbose)
     print('Net long term gain/loss per symbol')
     symbols_net_print(symbols, symbols_name, symbols_net_long, symbols_range, verbose)
+    return
 
 
 def summary(data: pd.DataFrame, is_long: pd.Series, is_short: pd.Series) -> None:
@@ -65,6 +66,7 @@ def summary(data: pd.DataFrame, is_long: pd.Series, is_short: pd.Series) -> None
           f"{format_dollar(total_long_losses := data.loc[is_long & is_loss, 'gain'].sum())}")
     if total_long_losses != 0:
         print(f"{','.join(data.loc[is_long & is_loss, 'symbol'].unique().tolist())}")
+    return
 
 
 def live_update(data: pd.DataFrame, symbols: list[str]) -> pd.DataFrame:
