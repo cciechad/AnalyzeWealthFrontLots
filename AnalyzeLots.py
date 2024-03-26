@@ -70,8 +70,7 @@ def summary(data: pd.DataFrame, is_long: pd.Series, is_short: pd.Series) -> None
 
 
 def live_update(data: pd.DataFrame, symbols: list[str]) -> pd.DataFrame:
-    symbol_price: dict[str, float] = {symbol: get_price(symbol) for symbol in symbols}
-    data['price'] = data['symbol'].map(symbol_price).astype(np.float32)
+    data['price'] = data['symbol'].map({symbol: get_price(symbol) for symbol in symbols}).astype(np.float32)
     data['value'] = data['quantity'] * data['price']
     data['gain'] = data['value'] - data['cost']
     return data.drop(columns=['price'])
