@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 from datetime import datetime, timedelta
+from multiprocessing import Pool
 from pathlib import Path
 
 import numpy as np
@@ -70,7 +71,8 @@ def summary(data: pd.DataFrame, is_long: pd.Series, is_short: pd.Series) -> None
 
 
 def live_update(data: pd.DataFrame, symbols: list[str]) -> pd.DataFrame:
-    data['price'] = data['symbol'].map({symbol: get_price(symbol) for symbol in symbols}).astype(np.float32)
+    with Pool() as pool:
+        data['price'] = data['symbol'].map(dict(pool.map(get_price, symbols))).astype(float)
     data['value'] = data['quantity'] * data['price']
     data['gain'] = data['value'] - data['cost']
     return data.drop(columns=['price'])
@@ -105,10 +107,10 @@ def format_dollar(amount: float) -> str:
     return f'-{formatted_absolute_amount}' if round(amount, 2) < 0 else formatted_absolute_amount
 
 
-def get_price(symbol: str) -> float:
+def get_price(symbol: str) -> tuple[str, float]:
     from yfinance import Ticker
     ticker: Ticker.fast_info = Ticker(symbol).fast_info
-    return ticker['lastPrice']
+    return symbol, ticker['lastPrice']
 
 
 if __name__ == '__main__':
