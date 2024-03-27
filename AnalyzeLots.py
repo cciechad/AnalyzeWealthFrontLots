@@ -6,21 +6,22 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from pandas import DataFrame, Series
 
 
 def main() -> None:
     args: argparse.Namespace = parse_args()
     pd.options.mode.copy_on_write = True
     if args.file.is_file():
-        data: pd.DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True, parse_dates=['date'],
-                                         names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'],
-                                         dtype={'quantity': np.uint16, 'cost': np.float32, 'value': np.float32,
-                                                'gain': np.float32, 'symbol': 'category', 'display_name': 'category'})
-        is_short: pd.Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
-        is_long: pd.Series[bool] = ~is_short
+        data: DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True, parse_dates=['date'],
+                                      names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'],
+                                      dtype={'quantity': np.uint16, 'cost': np.float32, 'value': np.float32,
+                                             'gain': np.float32, 'symbol': 'category', 'display_name': 'category'})
+        is_short: Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
+        is_long: Series[bool] = ~is_short
         symbols: list[str] = data['symbol'].unique().tolist()
         if args.live:
-            data: pd.DataFrame = live_update(data, symbols)
+            data: DataFrame = live_update(data, symbols)
         if not args.no_summary:
             summary(data, is_long, is_short)
         if args.symbol | args.no_summary:
@@ -30,13 +31,13 @@ def main() -> None:
     return
 
 
-def by_symbol(data: pd.DataFrame, symbols: list[str], is_long: pd.Series, is_short: pd.Series, verbose: bool) -> None:
+def by_symbol(data: DataFrame, symbols: list[str], is_long: Series, is_short: Series, verbose: bool) -> None:
     symbols_name: list[str] = data['display_name'].unique().tolist()
     symbols_net: list[float] = []
     symbols_net_short: list[float] = []
     symbols_net_long: list[float] = []
     for iter_symbol in symbols:
-        is_iter_symbol: pd.Series[bool] = data['symbol'] == iter_symbol
+        is_iter_symbol: Series[bool] = data['symbol'] == iter_symbol
         symbols_net.append(data.loc[is_iter_symbol, 'gain'].sum())
         symbols_net_long.append(data.loc[is_iter_symbol & is_long, 'gain'].sum(0))
         symbols_net_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum(0))
@@ -50,8 +51,8 @@ def by_symbol(data: pd.DataFrame, symbols: list[str], is_long: pd.Series, is_sho
     return
 
 
-def summary(data: pd.DataFrame, is_long: pd.Series, is_short: pd.Series) -> None:
-    is_loss: pd.Series[bool] = data['gain'] < 0
+def summary(data: DataFrame, is_long: Series, is_short: Series) -> None:
+    is_loss: Series[bool] = data['gain'] < 0
     print(f"Total cost {format_dollar(data['cost'].sum())}")
     print(f"Total value {format_dollar(data['value'].sum())}")
     print(f"Short term total value {format_dollar(data.loc[is_short, 'value'].sum())}")
@@ -70,7 +71,7 @@ def summary(data: pd.DataFrame, is_long: pd.Series, is_short: pd.Series) -> None
     return
 
 
-def live_update(data: pd.DataFrame, symbols: list[str]) -> pd.DataFrame:
+def live_update(data: DataFrame, symbols: list[str]) -> DataFrame:
     with Pool() as p:
         data['price'] = data['symbol'].map(dict(p.imap_unordered(get_price, symbols, chunksize=2))).astype(np.float32)
     data['value'] = data['quantity'] * data['price']
