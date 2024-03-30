@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import argparse
+from argparse import ArgumentParser, Namespace
 from datetime import datetime, timedelta
 from multiprocessing import Pool
 from pathlib import Path
@@ -10,7 +10,7 @@ from pandas import DataFrame, Series
 
 
 def main() -> None:
-    args: argparse.Namespace = parse_args()
+    args: Namespace = parse_args()
     pd.options.mode.copy_on_write = True
     if args.file.is_file():
         data: DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True, parse_dates=['date'],
@@ -79,10 +79,10 @@ def live_update(data: DataFrame, symbols: list[str]) -> DataFrame:
     return data.drop(columns=['price'])
 
 
-def parse_args() -> argparse.Namespace:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="Analyze Wealthfront cost-basis data. Displays net short/long term gains/losses and total "
-                    "short/long term losses by default.", epilog="File required")
+def parse_args() -> Namespace:
+    parser: ArgumentParser = ArgumentParser(description="Analyze Wealthfront cost-basis data. Displays net short/long "
+                                                        "term gains/losses & total short/long term losses by default.",
+                                            epilog="File required")
     parser.add_argument('-s', '--symbol', action='store_true',
                         help='Display net gain/loss by symbol and net short/long-term gain/loss per symbol')
     parser.add_argument('-n', '--no-summary', help='No summary', action='store_true')
