@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 from multiprocessing import Pool
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
+from numpy import uint16, float32
 from pandas import DataFrame, Series
 
 
@@ -15,8 +15,8 @@ def main() -> None:
     if args.file.is_file():
         data: DataFrame = pd.read_csv(args.file, header=1, low_memory=False, memory_map=True, parse_dates=['date'],
                                       names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'],
-                                      dtype={'quantity': np.uint16, 'cost': np.float32, 'value': np.float32,
-                                             'gain': np.float32, 'symbol': 'category', 'display_name': 'category'})
+                                      dtype={'quantity': uint16, 'cost': float32, 'value': float32, 'gain': float32,
+                                             'symbol': 'category', 'display_name': 'category'})
         is_short: Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: Series[bool] = ~is_short
         symbols: list[str] = data['symbol'].unique().tolist()
@@ -73,7 +73,7 @@ def summary(data: DataFrame, is_long: Series, is_short: Series) -> None:
 
 def live_update(data: DataFrame, symbols: list[str]) -> DataFrame:
     with Pool() as p:
-        data['price'] = data['symbol'].map(dict(p.imap_unordered(get_price, symbols, chunksize=2))).astype(np.float32)
+        data['price'] = data['symbol'].map(dict(p.imap_unordered(get_price, symbols, chunksize=2))).astype(float32)
     data['value'] = data['quantity'] * data['price']
     data['gain'] = data['value'] - data['cost']
     return data.drop(columns=['price'])
