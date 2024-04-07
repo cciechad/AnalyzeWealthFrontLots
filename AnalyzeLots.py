@@ -38,8 +38,8 @@ def by_symbol(data: DataFrame, symbols: list[str], is_long: Series, is_short: Se
     for iter_symbol in symbols:
         is_iter_symbol: Series[bool] = data['symbol'] == iter_symbol
         symbols_net.append(data.loc[is_iter_symbol, 'gain'].sum())
-        symbols_net_long.append(data.loc[is_iter_symbol & is_long, 'gain'].sum(0))
-        symbols_net_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum(0))
+        symbols_net_long.append(data.loc[is_iter_symbol & is_long, 'gain'].sum())
+        symbols_net_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum())
     symbols_range: range = range(len(symbols))
     print('Net gain/loss per symbol')
     symbols_net_print({symbols[i]: (symbols_name[i], symbols_net[i]) for i in symbols_range}, verbose)
