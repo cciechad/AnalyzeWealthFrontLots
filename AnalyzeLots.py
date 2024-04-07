@@ -42,11 +42,11 @@ def by_symbol(data: DataFrame, symbols: list[str], is_long: Series, is_short: Se
         symbols_net_short.append(data.loc[is_iter_symbol & is_short, 'gain'].sum(0))
     symbols_range: range = range(len(symbols))
     print('Net gain/loss per symbol')
-    symbols_net_print(symbols, symbols_name, symbols_net, symbols_range, verbose)
+    symbols_net_print({symbols[i]: (symbols_name[i], symbols_net[i]) for i in symbols_range}, verbose)
     print('Net short term gain/loss per symbol')
-    symbols_net_print(symbols, symbols_name, symbols_net_short, symbols_range, verbose)
+    symbols_net_print({symbols[i]: (symbols_name[i], symbols_net_short[i]) for i in symbols_range}, verbose)
     print('Net long term gain/loss per symbol')
-    symbols_net_print(symbols, symbols_name, symbols_net_long, symbols_range, verbose)
+    symbols_net_print({symbols[i]: (symbols_name[i], symbols_net_long[i]) for i in symbols_range}, verbose)
     return
 
 
@@ -92,9 +92,7 @@ def parse_args() -> Namespace:
     return parser.parse_args()
 
 
-def symbols_net_print(symbols: list[str], names: list[str], nets: list[float], symbols_range: range,
-                      verbose: bool) -> None:
-    net_pairs: dict[str, tuple[str, float]] = {symbols[i]: (names[i], nets[i]) for i in symbols_range}
+def symbols_net_print(net_pairs: dict[str, tuple[str, float]], verbose: bool) -> None:
     if verbose:
         print("\n".join(f"{k:8s}{v[0]:42.42s}{format_dollar(v[1]):>21s}" for k, v in net_pairs.items()))
     else:
