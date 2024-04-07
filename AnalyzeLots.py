@@ -103,7 +103,7 @@ def symbols_net_print(symbols: list[str], names: list[str], nets: list[float], s
 
 
 def format_dollar(amount: float) -> str:
-    formatted_absolute_amount: str = '${:,.2f}'.format(abs(amount))
+    formatted_absolute_amount: str = f'${abs(amount):,.2f}'
     return f'-{formatted_absolute_amount}' if round(amount, 2) < 0 else formatted_absolute_amount
 
 
