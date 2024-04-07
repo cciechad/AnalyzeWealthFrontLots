@@ -21,9 +21,9 @@ def main() -> None:
         symbols: list[str] = data['symbol'].unique().tolist()
         if args.live:
             data: DataFrame = live_update(data, symbols)
-        if not args.no_summary:
+        if args.summary:
             summary(data, is_long, is_short)
-        if args.symbol | args.no_summary:
+        if args.symbol | (not args.summary):
             by_symbol(data, symbols, is_long, is_short, args.verbose)
     else:
         print(f'{args.file} is not a readable file.')
@@ -84,7 +84,7 @@ def parse_args() -> Namespace:
                                             epilog="File required")
     parser.add_argument('-s', '--symbol', action='store_true',
                         help='Display net gain/loss by symbol and net short/long-term gain/loss per symbol')
-    parser.add_argument('-n', '--no-summary', help='No summary', action='store_true')
+    parser.add_argument('-n', '--no-summary', help='No summary', action='store_false', dest='summary')
     parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
     parser.add_argument('-d', '--days', help='Show results for number of days in the future', type=int, default=0)
     parser.add_argument('-v', '--verbose', help='Display ETF descriptions', action='store_true')
