@@ -72,7 +72,8 @@ def summary(data: DataFrame, is_long: Series, is_short: Series) -> None:
 
 def live_update(data: DataFrame, symbols: list[str]) -> DataFrame:
     with Pool() as p:
-        data['price'] = data['symbol'].map(dict(p.imap_unordered(get_price, symbols, chunksize=2))).astype(float32)
+        data['price'] = data['symbol'].map(
+            {k: v for k, v in p.imap_unordered(get_price, symbols, chunksize=2)}).astype(float32)
     data['value'] = data['quantity'] * data['price']
     data['gain'] = data['value'] - data['cost']
     return data.drop(columns=['price'])
