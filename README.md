@@ -42,4 +42,4 @@ Analyze file and update data live from YF and don't display summary
 
 Analyze file and show results for a week in the future. Summary only
 
-    nalyzeLots.py -f open-tax-lots-2024-04-08.csv -d 7
+    AnalyzeLots.py -f open-tax-lots-2024-04-08.csv -d 7
