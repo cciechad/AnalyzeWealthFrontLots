@@ -62,11 +62,11 @@ def summary(data: DataFrame, is_long: Series, is_short: Series) -> None:
     print(f"Total short term losses "
           f"{format_dollar(total_short_losses := data.loc[is_short & is_loss, 'gain'].sum())}")
     if total_short_losses != 0:
-        print(f"{','.join(data.loc[is_short & is_loss, 'symbol'].unique().tolist())}")
+        print(f"{','.join(data.loc[is_short & is_loss, 'symbol'].unique())}")
     print(f"Total long term losses "
           f"{format_dollar(total_long_losses := data.loc[is_long & is_loss, 'gain'].sum())}")
     if total_long_losses != 0:
-        print(f"{','.join(data.loc[is_long & is_loss, 'symbol'].unique().tolist())}")
+        print(f"{','.join(data.loc[is_long & is_loss, 'symbol'].unique())}")
     return
 
 
