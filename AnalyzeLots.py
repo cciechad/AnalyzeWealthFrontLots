@@ -52,8 +52,9 @@ def by_symbol(data: DataFrame, symbols: list[str], is_long: Series, is_short: Se
 
 def summary(data: DataFrame, is_long: Series, is_short: Series) -> None:
     is_loss: Series[bool] = data['gain'] < 0
-    print(f"Total cost {format_dollar(data['cost'].sum())}")
-    print(f"Total value {format_dollar(data['value'].sum())}")
+    print(f"Total cost {format_dollar(total_cost :=data['cost'].sum())}")
+    print(f"Total value {format_dollar(total_value := data['value'].sum())}")
+    print(f"Total gain/loss {((total_value / total_cost) - 1) * 100:.3f}%")
     print(f"Short term total value {format_dollar(data.loc[is_short, 'value'].sum())}")
     print(f"Long term total value {format_dollar(data.loc[is_long, 'value'].sum())}")
     print(f"Net gain/loss {format_dollar(data['gain'].sum())}")
