@@ -6,6 +6,7 @@ from pathlib import Path
 
 from numpy import uint16, float32
 from pandas import DataFrame, Series, read_csv, options as pdopt
+from pandas.core.arrays import ExtensionArray
 
 
 def main() -> None:
@@ -18,7 +19,7 @@ def main() -> None:
                                           'symbol': 'category', 'display_name': 'category'})
         is_short: Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: Series[bool] = ~is_short
-        symbols: Series[str] = data['symbol'].unique()
+        symbols: ExtensionArray = data['symbol'].unique()
         if args.live:
             data: DataFrame = live_update(data, symbols)
         if args.summary:
@@ -30,8 +31,8 @@ def main() -> None:
     return
 
 
-def by_symbol(data: DataFrame, symbols: Series, is_long: Series, is_short: Series, verbose: bool) -> None:
-    symbols_name: Series[str] = data['display_name'].unique()
+def by_symbol(data: DataFrame, symbols: ExtensionArray, is_long: Series, is_short: Series, verbose: bool) -> None:
+    symbols_name: ExtensionArray = data['display_name'].unique()
     symbols_net: list[float] = []
     symbols_net_short: list[float] = []
     symbols_net_long: list[float] = []
@@ -71,7 +72,7 @@ def summary(data: DataFrame, is_long: Series, is_short: Series) -> None:
     return
 
 
-def live_update(data: DataFrame, symbols: Series) -> DataFrame:
+def live_update(data: DataFrame, symbols: ExtensionArray) -> DataFrame:
     with Pool() as p:
         data['price'] = data['symbol'].map(
             {k: v for k, v in p.imap_unordered(get_price, symbols, chunksize=2)}).astype(float32)
