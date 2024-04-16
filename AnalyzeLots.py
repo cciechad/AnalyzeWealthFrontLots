@@ -18,7 +18,7 @@ def main() -> None:
                                           'symbol': 'category', 'display_name': 'category'})
         is_short: Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: Series[bool] = ~is_short
-        symbols: list[str] = data['symbol'].unique().tolist()
+        symbols: Series[str] = data['symbol'].unique()
         if args.live:
             data: DataFrame = live_update(data, symbols)
         if args.summary:
@@ -30,8 +30,8 @@ def main() -> None:
     return
 
 
-def by_symbol(data: DataFrame, symbols: list[str], is_long: Series, is_short: Series, verbose: bool) -> None:
-    symbols_name: list[str] = data['display_name'].unique().tolist()
+def by_symbol(data: DataFrame, symbols: Series, is_long: Series, is_short: Series, verbose: bool) -> None:
+    symbols_name: Series[str] = data['display_name'].unique()
     symbols_net: list[float] = []
     symbols_net_short: list[float] = []
     symbols_net_long: list[float] = []
@@ -71,7 +71,7 @@ def summary(data: DataFrame, is_long: Series, is_short: Series) -> None:
     return
 
 
-def live_update(data: DataFrame, symbols: list[str]) -> DataFrame:
+def live_update(data: DataFrame, symbols: Series) -> DataFrame:
     with Pool() as p:
         data['price'] = data['symbol'].map(
             {k: v for k, v in p.imap_unordered(get_price, symbols, chunksize=2)}).astype(float32)
