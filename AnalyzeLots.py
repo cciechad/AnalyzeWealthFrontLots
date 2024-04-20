@@ -24,7 +24,7 @@ def main() -> None:
             data: DataFrame = live_update(data, symbols)
         if args.summary:
             summary(data, is_long, is_short)
-        if args.symbol | (not args.summary):
+        if args.symbol or not args.summary:
             by_symbol(data, symbols, is_long, is_short, args.verbose)
     else:
         print(f'{args.file} is not a readable file.')
@@ -74,8 +74,8 @@ def summary(data: DataFrame, is_long: Series, is_short: Series) -> None:
 
 def live_update(data: DataFrame, symbols: ExtensionArray) -> DataFrame:
     with Pool() as p:
-        data['price'] = data['symbol'].map(
-            {k: v for k, v in p.imap_unordered(get_price, symbols, chunksize=2)}).astype(float32)
+        data['price'] = data['symbol'].map({k: v for k, v in
+                                            p.imap_unordered(get_price, symbols, chunksize=2)}).astype(float32)
     data['value'] = data['quantity'] * data['price']
     data['gain'] = data['value'] - data['cost']
     return data.drop(columns=['price'])
