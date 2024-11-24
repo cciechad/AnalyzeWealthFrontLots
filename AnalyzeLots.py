@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from multiprocessing import Pool
 from pathlib import Path
 
-from numpy import uint16, float32
+from numpy import float32
 from pandas import DataFrame, Series, read_csv, options as pdopt
 from pandas.core.arrays import ExtensionArray
 
@@ -15,7 +15,7 @@ def main() -> None:
     if args.file.is_file():
         data: DataFrame = read_csv(args.file, header=1, low_memory=False, memory_map=True, parse_dates=['date'],
                                    names=['symbol', 'display_name', 'date', 'cost', 'quantity', 'value', 'gain'],
-                                   dtype={'quantity': uint16, 'cost': float32, 'value': float32, 'gain': float32,
+                                   dtype={'quantity': float32, 'cost': float32, 'value': float32, 'gain': float32,
                                           'symbol': 'category', 'display_name': 'category'})
         is_short: Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: Series[bool] = ~is_short
