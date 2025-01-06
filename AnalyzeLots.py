@@ -20,6 +20,8 @@ def main() -> None:
         is_short: Series[bool] = data['date'] > (datetime.now() - timedelta(days=(365 - args.days)))
         is_long: Series[bool] = ~is_short
         symbols: ExtensionArray = data['symbol'].unique()
+        print(f'Loaded {len(data)} tax lots for {len(symbols)} symbols purchased between {data["date"].min().date()} to '
+              f'{data["date"].max().date()}')
         if args.live:
             data: DataFrame = live_update(data, symbols)
         if args.summary:
