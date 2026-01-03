@@ -47,9 +47,13 @@ def by_symbol(data: DataFrame, symbols: ExtensionArray, is_long: Series, is_shor
     print('Net gain/loss per symbol')
     print_symbols_net({symbols[i]: (symbols_name[i], symbols_net[i]) for i in symbols_range}, verbose)
     print('Net short term gain/loss per symbol')
-    print_symbols_net({symbols[i]: (symbols_name[i], symbols_net_short[i]) for i in symbols_range}, verbose)
+    print_symbols_net(
+        {symbols[i]: (symbols_name[i], symbols_net_short[i]) for i in symbols_range if symbols_net_short[i] != 0},
+        verbose)
     print('Net long term gain/loss per symbol')
-    print_symbols_net({symbols[i]: (symbols_name[i], symbols_net_long[i]) for i in symbols_range}, verbose)
+    print_symbols_net(
+        {symbols[i]: (symbols_name[i], symbols_net_long[i]) for i in symbols_range if symbols_net_long[i] != 0},
+        verbose)
     return
 
 
