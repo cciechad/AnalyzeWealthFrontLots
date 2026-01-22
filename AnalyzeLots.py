@@ -7,6 +7,8 @@ from pathlib import Path
 from numpy import float32
 from pandas import DataFrame, Series, read_csv, options as pdopt
 from pandas.core.arrays import ExtensionArray
+from yfinance import Ticker
+from yfinance.scrapers.quote import FastInfo
 
 
 def main() -> None:
@@ -28,8 +30,26 @@ def main() -> None:
             summary(data, is_long, is_short)
         if args.symbol or not args.summary:
             by_symbol(data, symbols, is_long, is_short, args.verbose)
+        if args.dividend:
+            calculate_dividends(data, symbols)
     else:
         print(f'{args.file} is not a readable file.')
+    return
+
+def calculate_dividends(data: DataFrame, symbols: ExtensionArray) -> None:
+    symbols_dividends: dict[str, float] = {}
+    for symbol in symbols:
+        ticker: Ticker = Ticker(symbol)
+        if ticker.dividends.empty:
+            annual_dividend: float = 0
+        else:
+            annual_dividend: float = ticker.dividends.iloc[-1] * 4
+        symbols_dividends[symbol] = data.loc[data['symbol'] == symbol, 'quantity'].sum() * annual_dividend
+    print("Annual Dividends (estimated):")
+    for item, amount in symbols_dividends.items():
+        if amount != 0:
+            print(f"{item}: ${amount:.2f}")
+    print(f"Total Annual dividends(estimated): ${sum(symbols_dividends.values()):.2f}")
     return
 
 
@@ -47,9 +67,13 @@ def by_symbol(data: DataFrame, symbols: ExtensionArray, is_long: Series, is_shor
     print('Net gain/loss per symbol')
     print_symbols_net({symbols[i]: (symbols_name[i], symbols_net[i]) for i in symbols_range}, verbose)
     print('Net short term gain/loss per symbol')
-    print_symbols_net({symbols[i]: (symbols_name[i], symbols_net_short[i]) for i in symbols_range}, verbose)
+    print_symbols_net(
+        {symbols[i]: (symbols_name[i], symbols_net_short[i]) for i in symbols_range if symbols_net_short[i] != 0},
+        verbose)
     print('Net long term gain/loss per symbol')
-    print_symbols_net({symbols[i]: (symbols_name[i], symbols_net_long[i]) for i in symbols_range}, verbose)
+    print_symbols_net(
+        {symbols[i]: (symbols_name[i], symbols_net_long[i]) for i in symbols_range if symbols_net_long[i] != 0},
+        verbose)
     return
 
 
@@ -75,9 +99,9 @@ def summary(data: DataFrame, is_long: Series, is_short: Series) -> None:
 
 
 def live_update(data: DataFrame, symbols: ExtensionArray) -> DataFrame:
-    with Pool() as p:
+    with Pool(processes=4) as p:
         data['price'] = data['symbol'].map({k: v for k, v in
-                                            p.imap_unordered(get_price, symbols, chunksize=2)}).astype(float32)
+                                            p.imap_unordered(get_price, symbols, chunksize=4)}).astype(float32)
     data['value'] = data['quantity'] * data['price']
     data['gain'] = data['value'] - data['cost']
     return data.drop(columns=['price'])
@@ -93,7 +117,10 @@ def parse_args() -> Namespace:
     parser.add_argument('-f', '--file', help='File to process', type=lambda p: Path(p).absolute(), required=True)
     parser.add_argument('-d', '--days', help='Show results for number of days in the future', type=int, default=0)
     parser.add_argument('-v', '--verbose', help='Display ETF descriptions', action='store_true')
-    parser.add_argument('-l', '--live', help='Get live price from YF(experimental)', action='store_true')
+    parser.add_argument('-l', '--live', help='Get live price from YF', action='store_true')
+    parser.add_argument('-D', '--dividend', action='store_true',
+                        help="Calculates yearly dividends. Experimental and probably not accurate uses last dividend * 4 "
+                             "to calculate. It's also slow as its not currently parallelized")
     return parser.parse_args()
 
 
@@ -111,8 +138,7 @@ def format_dollar(amount: float) -> str:
 
 
 def get_price(symbol: str) -> tuple[str, float]:
-    from yfinance import Ticker
-    ticker: Ticker.fast_info = Ticker(symbol).fast_info
+    ticker: FastInfo = Ticker(symbol).fast_info
     return symbol, ticker['lastPrice']
 
 
