@@ -39,9 +39,9 @@ def main() -> None:
 def calculate_dividends(data: DataFrame, symbols: ExtensionArray) -> None:
     symbols_dividends: dict[str, float] = {}
     with Pool(processes=4) as p:
-        dividend_map = {k: v for k, v in p.imap_unordered(get_annual_dividend, symbols, chunksize=4)}
+        dividend_map: dict[str, float] = {k: v for k, v in p.imap_unordered(get_annual_dividend, symbols, chunksize=4)}
     for symbol in symbols:
-        annual_dividend = dividend_map.get(symbol, 0)
+        annual_dividend: float = dividend_map.get(symbol, 0)
         symbols_dividends[symbol] = data.loc[data['symbol'] == symbol, 'quantity'].sum() * annual_dividend
     print("Annual Dividends (estimated):")
     for item, amount in symbols_dividends.items():
