@@ -38,12 +38,10 @@ def main() -> None:
 
 def calculate_dividends(data: DataFrame, symbols: ExtensionArray) -> None:
     symbols_dividends: dict[str, float] = {}
+    with Pool(processes=4) as p:
+        dividend_map = {k: v for k, v in p.imap_unordered(get_annual_dividend, symbols, chunksize=4)}
     for symbol in symbols:
-        ticker: Ticker = Ticker(symbol)
-        if ticker.dividends.empty:
-            annual_dividend: float = 0
-        else:
-            annual_dividend: float = ticker.dividends.iloc[-1] * 4
+        annual_dividend = dividend_map.get(symbol, 0)
         symbols_dividends[symbol] = data.loc[data['symbol'] == symbol, 'quantity'].sum() * annual_dividend
     print("Annual Dividends (estimated):")
     for item, amount in symbols_dividends.items():
@@ -140,6 +138,13 @@ def format_dollar(amount: float) -> str:
 def get_price(symbol: str) -> tuple[str, float]:
     ticker: FastInfo = Ticker(symbol).fast_info
     return symbol, ticker['lastPrice']
+
+
+def get_annual_dividend(symbol: str) -> tuple[str, float]:
+    ticker: Ticker = Ticker(symbol)
+    if ticker.dividends.empty:
+        return symbol, 0.0
+    return symbol, float(ticker.dividends.iloc[-1] * 4)
 
 
 if __name__ == '__main__':
