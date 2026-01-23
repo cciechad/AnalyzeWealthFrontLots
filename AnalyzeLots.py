@@ -36,6 +36,7 @@ def main() -> None:
         print(f'{args.file} is not a readable file.')
     return
 
+
 def calculate_dividends(data: DataFrame, symbols: ExtensionArray) -> None:
     symbols_dividends: dict[str, float] = {}
     with Pool(processes=4) as p:
@@ -118,7 +119,7 @@ def parse_args() -> Namespace:
     parser.add_argument('-l', '--live', help='Get live price from YF', action='store_true')
     parser.add_argument('-D', '--dividend', action='store_true',
                         help="Calculates yearly dividends. Experimental and probably not accurate uses last dividend * 4 "
-                             "to calculate. It's also slow as its not currently parallelized")
+                             "to calculate.")
     return parser.parse_args()
 
 
